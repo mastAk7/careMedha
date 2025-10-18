@@ -28,7 +28,7 @@ export function createApp() {
   app.use(withCookies);
 
   app.get('/api/health', (_req, res) => res.json({ ok: true }));
-  app.head('/health', (_req, res) => res.sendStatus(200)); // explicit for monitors
+  app.head('/api/health', (_req, res) => res.sendStatus(200)); // explicit for monitors
   app.use('/api/auth', authRoutes);
   app.use('/api/doctors', doctorRoutes);
   app.use('/api/slots', slotRoutes);
