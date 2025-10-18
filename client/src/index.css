@@ -1,0 +1,66 @@
+@import "tailwindcss";
+
+:root {
+	--bg: #fff7ed; /* warm apricot wash */
+	--surface: #ffffff;
+	--surface-2: #fffaf3;
+	--text: #0f172a;
+	--muted: #64748b;
+	--primary: #f59e0b; /* amber-500 */
+	--primary-600: #d97706; /* amber-600 */
+	--ring: 0 0 0 3px rgb(245 158 11 / 0.25);
+}
+
+html, body, #root { height: 100%; }
+body { background: radial-gradient(90rem 60rem at 10% -10%, #fde68a33, transparent), radial-gradient(70rem 50rem at 90% -20%, #fbcfe833, transparent), var(--surface-2); color: var(--text); font-family: "Poppins", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji", "Segoe UI Emoji"; }
+
+/* Containers */
+.container { @apply max-w-6xl mx-auto px-4; }
+.section { @apply py-6 md:py-10; }
+
+/* Cards */
+.card { @apply rounded-2xl border border-slate-200/70 bg-white/85 backdrop-blur-sm p-5 md:p-6 shadow-sm transition hover:shadow-md; }
+
+/* Typography helpers */
+.h1 { @apply text-3xl md:text-4xl font-semibold tracking-tight; }
+.h2 { @apply text-2xl md:text-3xl font-semibold tracking-tight; }
+.subtle { @apply text-sm text-slate-500; }
+
+/* Labels */
+.label { @apply text-sm font-medium text-slate-700; }
+
+/* Inputs */
+.input { @apply w-full rounded-xl border border-slate-300/80 bg-white/90 px-3.5 py-2.5 text-sm placeholder-slate-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500 transition; }
+.input[disabled] { @apply opacity-60 cursor-not-allowed; }
+
+/* Buttons */
+.btn { @apply inline-flex items-center justify-center rounded-full bg-amber-500 text-white px-5 py-2.5 text-sm font-semibold shadow-sm transition active:scale-[.98]; }
+.btn:hover { background: var(--primary-600); }
+.btn:focus { box-shadow: var(--ring); }
+.btn[disabled] { @apply opacity-50 cursor-not-allowed; }
+
+.btn-outline { @apply inline-flex items-center justify-center rounded-full border border-amber-200 bg-white text-amber-700 px-5 py-2.5 text-sm font-semibold shadow-sm transition; }
+.btn-outline:hover { @apply bg-amber-50; }
+
+/* Links */
+.link { @apply text-amber-600 hover:text-amber-700 underline-offset-2 hover:underline; }
+
+/* Badges / Chips */
+.badge { @apply inline-flex items-center gap-1 rounded-full bg-amber-50 text-amber-700 px-2 py-0.5 text-xs font-medium border border-amber-100; }
+.badge-gray { @apply bg-slate-100 text-slate-700 border-slate-200; }
+
+/* Tables and lists */
+.list-row { @apply flex items-center justify-between rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm; }
+
+/* Utility helpers used across pages */
+.row { @apply flex items-center gap-2; }
+.col { @apply grid grid-cols-1 md:grid-cols-2 gap-2; }
+
+/* Page-specific polish without touching components */
+nav { @apply sticky top-0 z-40 bg-white/80 backdrop-blur border-b border-slate-200; }
+nav .brand { @apply text-xl font-semibold tracking-tight; }
+nav a { @apply text-sm text-slate-700 hover:text-slate-900; }
+nav .btn, nav .btn-outline { @apply h-9 px-4; }
+/* ensure hamburger is hidden on md+ regardless of utility order */
+.mobile-toggle { @apply md:hidden; }
+footer { @apply bg-white/60 backdrop-blur; }

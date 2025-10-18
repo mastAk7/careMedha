@@ -1,0 +1,164 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL") // runtime (pooler, IPv4)
+  directUrl = env("DIRECT_URL")   // migrations (direct, IPv6)
+}
+
+enum Role { 
+  PATIENT 
+  DOCTOR 
+  PHARMACY_ADMIN 
+  SUPERADMIN 
+}
+
+model User {
+  id            String   @id @default(cuid())
+  phone         String?  @unique
+  email         String  @unique
+  passwordHash  String
+  name          String
+  role          Role     @default(PATIENT)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  patient       Patient?
+  doctor        Doctor?
+  pharmacyAdmin PharmacyAdmin?
+}
+
+model Patient {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  gender    String?
+  birthYear Int?
+  address   String?
+  lat       Float?
+  lng       Float?
+  user      User     @relation(fields: [userId], references: [id])
+  appointments Appointment[]
+  prescriptions Prescription[]  @relation("PatientPrescriptions")
+}
+
+model Doctor {
+  id             String   @id @default(cuid())
+  userId         String   @unique
+  specialization String
+  clinicName     String?
+  clinicAddress  String?
+  lat            Float?
+  lng            Float?
+  bio            String?
+  fee            Int?
+  isActive       Boolean   @default(true)
+  user           User      @relation(fields: [userId], references: [id])
+  slots          Slot[]
+  appointments   Appointment[]
+}
+
+model Pharmacy {
+  id        String   @id @default(cuid())
+  name      String
+  address   String?
+  lat       Float?
+  lng       Float?
+  phone     String?
+  isActive  Boolean  @default(true)
+  admins    PharmacyAdmin[]
+  inventory PharmacyInventory[]
+}
+
+model PharmacyAdmin {
+  id         String   @id @default(cuid())
+  userId     String   @unique
+  pharmacyId String
+  user       User     @relation(fields: [userId], references: [id])
+  pharmacy   Pharmacy @relation(fields: [pharmacyId], references: [id])
+}
+
+model Medicine {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  form      String?
+  strength  String?
+  tags      String[]
+  inventory PharmacyInventory[]
+}
+
+model PharmacyInventory {
+  id          String   @id @default(cuid())
+  pharmacyId  String
+  medicineId  String
+  stockQty    Int      @default(0)
+  price       Int?
+  updatedAt   DateTime @updatedAt
+  pharmacy    Pharmacy @relation(fields: [pharmacyId], references: [id])
+  medicine    Medicine @relation(fields: [medicineId], references: [id])
+  @@unique([pharmacyId, medicineId])
+}
+
+model Slot {
+  id        String   @id @default(cuid())
+  doctorId  String
+  startAt   DateTime
+  endAt     DateTime
+  capacity  Int      @default(1)
+  booked    Int      @default(0)
+  isOpen    Boolean  @default(true)
+  doctor    Doctor   @relation(fields: [doctorId], references: [id])
+  appointments Appointment[]
+  @@index([doctorId, startAt])
+}
+
+model Appointment {
+  id          String   @id @default(cuid())
+  patientId   String
+  doctorId    String
+  slotId      String?
+  status      String   @default("BOOKED") // BOOKED|CANCELLED|DONE|NO_SHOW
+  mode        String   @default("VIDEO")  // VIDEO|AUDIO|IN_PERSON
+  reason      String?
+  createdAt   DateTime @default(now())
+  patient     Patient  @relation(fields: [patientId], references: [id])
+  doctor      Doctor   @relation(fields: [doctorId], references: [id])
+  slot        Slot?    @relation(fields: [slotId], references: [id])
+  prescription Prescription?
+  session     Session?
+}
+
+model Prescription {
+  id            String   @id @default(cuid())
+  appointmentId String   @unique
+  patientId     String
+  notes         String?
+  createdAt     DateTime @default(now())
+  patient       Patient      @relation("PatientPrescriptions", fields: [patientId], references: [id])
+  appointment   Appointment @relation(fields: [appointmentId], references: [id])
+  items         PrescriptionItem[]
+}
+
+model PrescriptionItem {
+  id             String   @id @default(cuid())
+  prescriptionId String
+  medicineName   String
+  dosage         String?
+  instructions   String?
+  prescription   Prescription @relation(fields: [prescriptionId], references: [id])
+}
+
+model Session {
+  id            String   @id @default(cuid())
+  appointmentId String   @unique
+  joinCode      String   @unique
+  startedAt     DateTime?
+  endedAt       DateTime?
+  appointment   Appointment @relation(fields: [appointmentId], references: [id])
+}
